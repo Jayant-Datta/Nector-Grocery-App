@@ -1,33 +1,25 @@
 import { create } from 'zustand';
 import type { Product } from '../types';
-import { mockProducts } from '../data/mockData';
 
 interface FavoriteState {
   favorites: Product[];
-  addFavorite: (product: Product) => void;
-  removeFavorite: (productId: string) => void;
   toggleFavorite: (product: Product) => void;
-  isFavorite: (productId: string) => boolean;
 }
 
-export const useFavoriteStore = create<FavoriteState>((set, get) => ({
-  // Pre-load with the exact mock data from your screenshot
-  favorites: mockProducts.filter(p => ['9', '10', '11', '13', '14'].includes(p.id)),
+export const useFavoriteStore = create<FavoriteState>((set) => ({
+  // 1. Start completely empty! No pre-stored favorites.
+  favorites: [], 
   
-  addFavorite: (product) => set((state) => ({ favorites: [...state.favorites, product] })),
-  
-  removeFavorite: (productId) => set((state) => ({
-    favorites: state.favorites.filter((p) => p.id !== productId),
-  })),
-  
-  toggleFavorite: (product) => {
-    const isFav = get().isFavorite(product.id);
-    if (isFav) {
-      get().removeFavorite(product.id);
+  // 2. Toggle logic: If it exists, remove it. If it doesn't, add it.
+  toggleFavorite: (product) => set((state) => {
+    const isAlreadyFavorite = state.favorites.some((p) => p.id === product.id);
+    
+    if (isAlreadyFavorite) {
+      // Remove it
+      return { favorites: state.favorites.filter((p) => p.id !== product.id) };
     } else {
-      get().addFavorite(product);
+      // Add it
+      return { favorites: [...state.favorites, product] };
     }
-  },
-  
-  isFavorite: (productId) => get().favorites.some((p) => p.id === productId),
+  }),
 }));

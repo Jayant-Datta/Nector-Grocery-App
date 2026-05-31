@@ -30,18 +30,18 @@ export default function Account() {
       <div className="px-6 flex items-center gap-5 pb-8 border-b border-[#E2E2E2]">
         <div className="w-[64px] h-[64px] rounded-[27px] overflow-hidden border border-[#E2E2E2] flex items-center justify-center bg-gray-100 flex-shrink-0">
           {/* Fallback avatar if no image */}
-          <span className="text-2xl font-bold text-darkGray">A</span>
+          <span className="text-2xl font-bold text-darkGray">R</span>
         </div>
         <div className="flex flex-col flex-grow">
           <div className="flex items-center gap-2">
-            <h1 className="text-[20px] font-bold text-darkGray leading-tight">Afsar Hossen</h1>
+            <h1 className="text-[20px] font-bold text-darkGray leading-tight">Rahul Sharma</h1>
             <button className="text-primary hover:opacity-70 mt-1">
               <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M2.5 12.5H12.5M4.5 10.5L10.5 4.5C11.0523 3.94772 11.9477 3.94772 12.5 4.5C13.0523 5.05228 13.0523 5.94772 12.5 6.5L6.5 12.5H4.5V10.5Z" stroke="#53B175" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </button>
           </div>
-          <p className="text-base text-lightGray">Imshuvo97@gmail.com</p>
+          <p className="text-base text-lightGray">RahulSharma@gmail.com</p>
         </div>
       </div>
 

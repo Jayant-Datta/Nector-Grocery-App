@@ -1,65 +1,86 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import blurBg from '../../assets/blur-bg.png';
 import backArrow from '../../assets/back-arrow.svg';
-import arrowRight from '../../assets/arrow-right.svg';
 
 export default function Verification() {
   const navigate = useNavigate();
-  const [otp, setOtp] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [code, setCode] = useState('');
 
-  const handleVerify = () => {
-    if (otp.length !== 4) return;
-    setIsLoading(true);
-    
-    setTimeout(() => {
-      setIsLoading(false);
-      navigate('/location');
-    }, 1000);
+  // Validation: Exactly 4 digits
+  const isValid = code.length === 4;
+
+  const handleNext = () => {
+    if (isValid) {
+      navigate('/location'); 
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (isValid) {
+        handleNext();
+      }
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const digitsOnly = e.target.value.replace(/\D/g, '');
+    if (digitsOnly.length <= 4) {
+      setCode(digitsOnly);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-white relative flex flex-col">
-      <img src={blurBg} alt="" className="absolute top-0 left-0 w-full h-auto opacity-70 pointer-events-none" />
-      
-      <div className="px-6 pt-12 relative z-10 flex-grow">
-        <button onClick={() => navigate(-1)} className="mb-14">
-          <img src={backArrow} alt="Back" className="w-3 h-5" />
-        </button>
-        
-        <h2 className="text-[26px] font-semibold text-darkGray leading-tight mb-8">
-          Enter your 4-digit code
-        </h2>
-        
-        <div className="flex flex-col mb-8">
-          <label className="text-lightGray text-base mb-2">Code</label>
-          <input 
-            type="text"
-            maxLength={4}
-            value={otp}
-            onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-            className="w-full text-lg tracking-[0.5em] text-darkGray border-b border-[#E2E2E2] pb-2 outline-none bg-transparent"
-            placeholder="- - - -"
+    <div className="min-h-screen bg-white px-6 pt-12 relative flex flex-col">
+      {/* Back Button */}
+      <button 
+        onClick={() => navigate(-1)} 
+        className="mb-16 -ml-2 p-2"
+      >
+        <img src={backArrow} alt="Back" className="w-5 h-5" />
+      </button>
+
+      <h1 className="text-[26px] font-semibold text-darkGray mb-8">
+        Enter your 4-digit code
+      </h1>
+
+      <div className="flex flex-col mb-10">
+        <label className="text-lightGray text-sm mb-2 font-medium">Code</label>
+        <div className="border-b border-[#E2E2E2] pb-2">
+          <input
+            type="tel"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            value={code}
+            onChange={handleChange}
+            onKeyDown={handleKeyDown}
             autoFocus
+            className="w-full text-[18px] text-darkGray outline-none bg-transparent tracking-[0.5em]"
+            placeholder="- - - -"
           />
         </div>
       </div>
 
-      <div className="px-6 pb-12 flex justify-between items-center relative z-10">
-        <button className="text-primary font-medium hover:opacity-80 transition-opacity">
+      {/* Bottom Controls */}
+      <div className="absolute bottom-10 left-6 right-6 flex justify-between items-center">
+        <button className="text-primary font-medium hover:opacity-70 transition-opacity">
           Resend Code
         </button>
+        
         <button 
-          onClick={handleVerify}
-          disabled={isLoading || otp.length !== 4}
-          className="w-16 h-16 bg-primary rounded-full flex items-center justify-center hover:bg-green-600 transition-colors disabled:opacity-50"
+          onClick={handleNext}
+          disabled={!isValid}
+          className={`w-[67px] h-[67px] rounded-full flex items-center justify-center shadow-lg transition-all duration-300 ${
+            isValid 
+              ? 'bg-primary hover:bg-green-600 cursor-pointer' 
+              : 'bg-primary opacity-40 cursor-not-allowed'
+          }`}
         >
-          {isLoading ? (
-            <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
-          ) : (
-            <img src={arrowRight} alt="Next" className="w-4 h-4" />
-          )}
+          {/* Bold SVG Arrow - matches the NumberInput screen exactly */}
+          <svg width="10" height="18" viewBox="0 0 10 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M1.5 1.5L8.5 9L1.5 16.5" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
         </button>
       </div>
     </div>

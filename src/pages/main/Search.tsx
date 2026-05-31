@@ -3,6 +3,7 @@ import { useNavigate, useOutletContext } from 'react-router-dom';
 import { useProductStore } from '../../store/useProductStore';
 import { useFilterStore } from '../../store/useFilterStore';
 import ProductCard from '../../components/ui/ProductCard';
+import { useDebounce } from '../../hooks/useDebounce'; // <-- Imported the new hook
 
 export default function Search() {
   const navigate = useNavigate();
@@ -11,17 +12,21 @@ export default function Search() {
   const products = useProductStore((state) => state.products);
   const { categories: activeFilters } = useFilterStore();
   
+  // The live input state (updates instantly so the keyboard feels fast)
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // The delayed state (waits 300ms before triggering the heavy filtering)
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
   // Check if ANY filter is actually turned on
   const isFilterApplied = Object.values(activeFilters).some(isChecked => isChecked);
 
-  // Advanced Filtering Logic
-  const searchResults = searchQuery.trim() === '' 
+  // Advanced Filtering Logic - Now using debouncedSearchQuery
+  const searchResults = debouncedSearchQuery.trim() === '' 
     ? [] 
     : products.filter(p => {
         // 1. Must match search text
-        const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesSearch = p.name.toLowerCase().includes(debouncedSearchQuery.toLowerCase());
         if (!matchesSearch) return false;
 
         // 2. If no filters are selected, show everything that matched the search
@@ -54,7 +59,7 @@ export default function Search() {
           </svg>
           <input 
             type="text" 
-            value={searchQuery}
+            value={searchQuery} // UI uses immediate state
             onChange={(e) => setSearchQuery(e.target.value)}
             autoFocus
             placeholder="Search Store"
@@ -69,7 +74,7 @@ export default function Search() {
           )}
         </div>
         
-        {/* Filter Button (Now shows a tiny green dot if filters are active!) */}
+        {/* Filter Button */}
         <button onClick={() => navigate('/filters')} className="p-2 relative">
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M7.5 13.5H10.5M3 4.5H15M5.25 9H12.75" stroke="#181725" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -88,13 +93,14 @@ export default function Search() {
           </div>
         ))}
         
-        {searchQuery.trim() !== '' && searchResults.length === 0 && (
+        {/* Empty States - Also use debounced text so it doesn't flash while typing */}
+        {debouncedSearchQuery.trim() !== '' && searchResults.length === 0 && (
           <div className="col-span-2 text-center text-lightGray mt-10">
             No products match your search and filter criteria.
           </div>
         )}
 
-        {searchQuery.trim() === '' && (
+        {debouncedSearchQuery.trim() === '' && (
           <div className="col-span-2 text-center text-lightGray mt-10">
             Type a product name to start searching...
           </div>

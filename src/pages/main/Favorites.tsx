@@ -25,11 +25,24 @@ export default function Favorites() {
         <h1 className="text-xl font-bold text-darkGray">Favourite</h1>
       </div>
 
-      {/* List */}
+      {/* List / Empty State */}
       <div className="flex-grow px-6 overflow-y-auto">
         {favorites.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-lightGray mt-20">
-            You have no favorite items yet.
+          // BEAUTIFUL EMPTY STATE
+          <div className="flex flex-col items-center justify-center h-full text-center mt-20">
+            <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="#E2E2E2" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="mb-6">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+            <h2 className="text-2xl font-bold text-darkGray mb-2">No favorites yet</h2>
+            <p className="text-[#7C7C7C] mb-8 px-4">
+              Save your favorite grocery items here to easily find them later.
+            </p>
+            <button 
+              onClick={() => navigate('/explore')}
+              className="w-full bg-primary text-white font-semibold py-4 rounded-[19px] hover:bg-green-600 transition-colors shadow-sm"
+            >
+              Explore Products
+            </button>
           </div>
         ) : (
           favorites.map((item) => (
@@ -63,7 +76,7 @@ export default function Favorites() {
         )}
       </div>
 
-      {/* Add All To Cart Button */}
+      {/* Add All To Cart Button (Only shows if there are favorites) */}
       {favorites.length > 0 && (
         <div className={`fixed w-full max-w-md px-6 z-40 transition-all duration-500 ${isNavVisible ? 'bottom-[100px]' : 'bottom-6'}`}>
           <button 

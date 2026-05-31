@@ -1,91 +1,91 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../../store/useAuthStore';
-import blurBg from '../../assets/blur-bg.png';
+import { useLocationStore } from '../../store/useLocationStore';
 import backArrow from '../../assets/back-arrow.svg';
 import mapIllustration from '../../assets/map-illustration.svg';
 
 export default function Location() {
   const navigate = useNavigate();
-  const setLocationStore = useAuthStore((state) => state.setLocation);
+  // 1. Bring in the function to save the location
+  const setLocation = useLocationStore((state) => state.setLocation);
+  const [selectedZone, setSelectedZone] = useState('');
+
+  // 10 Major Indian Cities
+  const cities = [
+    "Ahmedabad", "Bengaluru", "Chennai", "Delhi", 
+    "Hyderabad", "Jaipur", "Kolkata", "Lucknow", 
+    "Mumbai", "Pune"
+  ];
   
-  const [zone, setZone] = useState('');
-  const [area, setArea] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const directions = ["North", "South", "East", "West"];
+
+  // Generate the full list (e.g., "Kolkata North")
+  const locationOptions = cities.flatMap(city => 
+    directions.map(dir => `${city} ${dir}`)
+  );
 
   const handleSubmit = () => {
-    if (!zone || !area) return;
-    setIsLoading(true);
-    
-    setTimeout(() => {
-      setLocationStore(zone, area);
-      setIsLoading(false);
-      navigate('/home'); // We will build this next
-    }, 1000);
+    if (selectedZone) {
+      // 2. Save it to the global store
+      setLocation(selectedZone); 
+      // 3. Go to home
+      navigate('/home');         
+    }
   };
 
   return (
-    <div className="min-h-screen bg-white relative flex flex-col items-center">
-      <img src={blurBg} alt="" className="absolute top-0 left-0 w-full h-auto opacity-70 pointer-events-none" />
-      
-      <div className="w-full px-6 pt-12 relative z-10">
-        <button onClick={() => navigate(-1)} className="mb-10">
-          <img src={backArrow} alt="Back" className="w-3 h-5" />
-        </button>
+    <div className="min-h-screen bg-white px-6 pt-12 relative flex flex-col items-center">
+      <button onClick={() => navigate(-1)} className="absolute top-12 left-4 p-2">
+        <img src={backArrow} alt="Back" className="w-5 h-5" />
+      </button>
+
+      <div className="mt-10 mb-10 w-full flex justify-center">
+        <img src={mapIllustration} alt="Map" className="w-48 h-auto" />
       </div>
+
+      <h1 className="text-[26px] font-semibold text-darkGray mb-4 text-center">
+        Select Your Location
+      </h1>
       
-      <div className="flex flex-col items-center px-6 relative z-10 w-full flex-grow">
-        <img src={mapIllustration} alt="Map" className="w-[220px] h-auto mb-8" />
-        
-        <h2 className="text-[26px] font-semibold text-darkGray mb-4 text-center">
-          Select Your Location
-        </h2>
-        <p className="text-lightGray text-center mb-10 px-4">
-          Switch on your location to stay in tune with what's happening in your area
-        </p>
+      <p className="text-[#7C7C7C] text-center text-[15px] leading-relaxed px-4 mb-10">
+        Switch on your location to stay in tune with what's happening in your area
+      </p>
 
-        <div className="w-full flex flex-col gap-6 mb-10">
-          <div className="flex flex-col">
-            <label className="text-lightGray text-sm mb-2">Your Zone</label>
-            <select 
-              value={zone}
-              onChange={(e) => setZone(e.target.value)}
-              className="w-full text-lg text-darkGray border-b border-[#E2E2E2] pb-2 outline-none bg-transparent appearance-none"
-            >
-              <option value="" disabled>Select your zone</option>
-              <option value="Banasree">Banasree</option>
-              <option value="Gulshan">Gulshan</option>
-              <option value="Dhanmondi">Dhanmondi</option>
-            </select>
-          </div>
-
-          <div className="flex flex-col">
-            <label className="text-lightGray text-sm mb-2">Your Area</label>
-            <select 
-              value={area}
-              onChange={(e) => setArea(e.target.value)}
-              className="w-full text-lg text-darkGray border-b border-[#E2E2E2] pb-2 outline-none bg-transparent appearance-none"
-            >
-              <option value="" disabled>Types of your area</option>
-              <option value="Block A">Block A</option>
-              <option value="Block B">Block B</option>
-              <option value="Block C">Block C</option>
-            </select>
+      <div className="w-full flex flex-col mb-10">
+        <label className="text-[#7C7C7C] text-sm mb-2 font-medium">Your Zone</label>
+        <div className="relative border-b border-[#E2E2E2] pb-2">
+          <select 
+            value={selectedZone}
+            onChange={(e) => setSelectedZone(e.target.value)}
+            className="w-full text-[18px] text-darkGray outline-none bg-transparent appearance-none"
+          >
+            <option value="" disabled>Select your zone</option>
+            {locationOptions.map((loc) => (
+              <option key={loc} value={loc}>
+                {loc}
+              </option>
+            ))}
+          </select>
+          
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none">
+            <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M1 1L7 7L13 1" stroke="#7C7C7C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
           </div>
         </div>
-        
-        <button 
-          onClick={handleSubmit}
-          disabled={isLoading || !zone || !area}
-          className="w-full bg-primary text-white font-semibold py-4 rounded-2xl hover:bg-green-600 transition-colors disabled:opacity-50 flex items-center justify-center"
-        >
-          {isLoading ? (
-             <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
-          ) : (
-            "Submit"
-          )}
-        </button>
       </div>
+
+      <button 
+        onClick={handleSubmit}
+        disabled={!selectedZone}
+        className={`w-full py-4 rounded-2xl font-semibold text-white transition-all duration-300 ${
+          selectedZone 
+            ? 'bg-primary hover:bg-green-600 cursor-pointer' 
+            : 'bg-primary opacity-40 cursor-not-allowed'
+        }`}
+      >
+        Submit
+      </button>
     </div>
   );
 }

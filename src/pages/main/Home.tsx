@@ -2,6 +2,7 @@ import { useOutletContext, useNavigate } from 'react-router-dom';
 import { useProductStore } from '../../store/useProductStore';
 import ProductCard from '../../components/ui/ProductCard';
 import { ProductCategory } from '../../types'; 
+import { useLocationStore } from '../../store/useLocationStore';
 
 import carrotLogo from '../../assets/carrot-only.svg';
 import locationPin from '../../assets/location-pin.svg';
@@ -13,6 +14,9 @@ import riceImg from '../../assets/rice.png';
 export default function Home() {
   const navigate = useNavigate();
   const products = useProductStore((state) => state.products);
+  
+  // 1. Grab the location from your global store
+  const location = useLocationStore((state) => state.location);
   
   // Grab the visibility state from the Layout for dynamic padding
   const { isNavVisible } = useOutletContext<{ isNavVisible: boolean }>();
@@ -29,7 +33,8 @@ export default function Home() {
         <img src={carrotLogo} alt="Nectar" className="w-8 h-auto mb-2" />
         <div className="flex items-center gap-2">
           <img src={locationPin} alt="Location" className="w-4 h-4" />
-          <span className="text-lg text-darkGray font-semibold">Dhaka, Banassre</span>
+          {/* 2. Display the dynamic location here */}
+          <span className="text-lg text-darkGray font-semibold">{location}</span>
         </div>
       </div>
 

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useProductStore } from '../../store/useProductStore';
 import { useCartStore } from '../../store/useCartStore';
+import { useFavoriteStore } from '../../store/useFavoriteStore'; // <-- Imported favorite store
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
@@ -9,6 +10,9 @@ export default function ProductDetail() {
   
   const products = useProductStore((state) => state.products);
   const addToCart = useCartStore((state) => state.addToCart);
+  
+  // <-- Grab favorites and the toggle function from the store
+  const { favorites, toggleFavorite } = useFavoriteStore(); 
   
   // Safely find the product
   const product = products.find((p) => p.id === id);
@@ -25,6 +29,9 @@ export default function ProductDetail() {
       </div>
     );
   }
+
+  // <-- Check if THIS specific product is currently favorited
+  const isFavorite = favorites.some((fav) => fav.id === product.id);
 
   const handleAddQuantity = () => setQuantity(prev => prev + 1);
   const handleSubtractQuantity = () => setQuantity(prev => (prev > 1 ? prev - 1 : 1));
@@ -60,7 +67,6 @@ export default function ProductDetail() {
           <img 
             src={product.imageUrl} 
             alt={product.name} 
-            /* w-full, h-full, and scale-125 force the image to be large and prominent */
             className="w-[85%] h-[85%] object-contain drop-shadow-xl scale-125" 
           />
         </div>
@@ -72,10 +78,21 @@ export default function ProductDetail() {
           <h1 className="text-[24px] font-bold text-darkGray leading-tight max-w-[80%]">
             {product.name}
           </h1>
-          <button className="hover:opacity-70 transition-opacity mt-1">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12.001 20.24L10.551 18.91C5.40098 14.25 2.00098 11.17 2.00098 7.5C2.00098 4.42 4.42098 2 7.50098 2C9.24098 2 10.911 2.81 12.001 4.09C13.091 2.81 14.761 2 16.501 2C19.581 2 22.001 4.42 22.001 7.5C22.001 11.17 18.601 14.25 13.451 18.92L12.001 20.24Z" stroke="#7C7C7C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+          
+          {/* <-- Dynamic Interactive Heart Button --> */}
+          <button 
+            onClick={() => toggleFavorite(product)}
+            className="hover:opacity-70 transition-transform active:scale-90 mt-1 p-1"
+          >
+            {isFavorite ? (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="#FF4B4B" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+              </svg>
+            ) : (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7C7C7C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              </svg>
+            )}
           </button>
         </div>
         
